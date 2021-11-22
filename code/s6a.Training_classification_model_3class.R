@@ -2,7 +2,6 @@ pacman::p_load(data.table,tidyverse,caret,stringr,keras,tensorflow, optparse, mu
 
 rm(list=ls())
 gc()
-Rcpp::sourceCpp("all_functions.cpp")
 
 args <- commandArgs(trailingOnly=TRUE)
 
@@ -29,8 +28,24 @@ if (is.null(opt$vali)|is.null(opt$train)){
   stop("Validation/testing and training files must be supplied (-v & -t).", call.=FALSE)
 }
 
+getdinodir <- function(){
+    commandArgs() %>%
+       tibble::enframe(name=NULL) %>%
+       tidyr::separate(col=value, into=c("key", "value"), sep="=", fill='right') %>%
+       dplyr::filter(key == "--file") %>%
+       dplyr::pull(value) %>%
+       word(., start=1, end=-3, sep="/")
+}
+dinodir <- getdinodir()
+
+Rcpp::sourceCpp(paste0(dinodir,"/code/all_functions.cpp"))
+
 train=readRDS(opt$train)
+train$x=train$x[,,c(1:43),]
+train$x=array_reshape(train$x,dim=c(nrow(train$x),5,43,1))
 vali=readRDS(opt$vali)
+vali$x=vali$x[,,c(1:43),]
+vali$x=array_reshape(vali$x,dim=c(nrow(vali$x),5,43,1))
 
 reset_keras=function(){
   sess=tf$compat$v1$keras$backend$get_session()
@@ -111,10 +126,10 @@ model %>% compile(
 save.checkpoint=callback_model_checkpoint(paste0(opt$name,'.best_pos5_mix_3class_resnet.h5'),monitor = "val_accuracy",save_best_only = T,mode="auto")
 
 history <- model %>% fit(
-  x=train$x[,,c(1:43),], y=train_lab, 
+  x=train$x, y=train_lab, 
   epochs = opt$epoch, batch_size = opt$batch, 
   callbacks = save.checkpoint,
-  validation_data=list(vali$x[,,c(1:43),],vali_lab),
+  validation_data=list(vali$x,vali_lab),
   class_weight=list('0'=0.9,'1'=1.8,'2'=3)
 )
 

@@ -1,23 +1,23 @@
 #!/bin/bash
 
-rpath=/code/s6a.Training_classification_model_3class.R
-exptdir=$1
-agggrp=$2
-numcore=$3
+codedir=$(cd `dirname $0` && pwd)
 
-vali=$agggrp.validation_matrix.rds
-train=$agggrp.training_matrix.rds
-epoch=$4
-batch=$5
-seed=$6
+rpath=${codedir}/s6a.Training_classification_model_3class.R
+inputdir=$1
+groupName=$2
+epoch=$3
+batch=$4
+seed=$5
 
-cnndir=$(dirname $exptdir)/matrix_CNN
+vali=$groupName.validation_matrix.rds
+train=$groupName.training_matrix.rds
 
-cd $cnndir
+cd $inputdir
+
 echo =========================================================================================
 echo "S6a Start: $(date)"
 
-Rscript $rpath -v $vali -t $train -o $agggrp -e $epoch -b $batch -s $seed
+Rscript $rpath -v $vali -t $train -o $groupName -e $epoch -b $batch -s $seed
 
-echo -e S6a End: $(date) "\n"
+echo -e "S6a End: $(date) \n"
 echo =========================================================================================
