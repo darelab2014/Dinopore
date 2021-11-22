@@ -171,7 +171,7 @@ We provided 3 trained models for testing. Users can used our models to detect In
 
 ### (II) Training path: 
 
-We allow users to train models using their own data. Depends on size of data set, number of epochs, batch size and GPU type, time requires for training is different.
+We allow users to train models, based on our architectures and use their own data. Depends on size of data set, number of epochs, batch size and GPU type, time requires for training is different.
 
 For our data: model 3 was trained using 265,631 positions with 893,865 matrices, on GPU Tesla V100-SXM2-32GB with batch size = 1024. Time for 1 epoch is 42 seconds and there were 900 epochs.
 
