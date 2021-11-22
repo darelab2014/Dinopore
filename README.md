@@ -142,10 +142,13 @@ Steps:
 
 	Note: This script can be run on any number of runs and will determine how reads across runs (if applicable) are aggregated before passing into the CNN model.
 
-**From step 5 onwards, there are 2 paths: training and testing.**
+
+### **From step 5 onwards, there are 2 paths: training and testing.**
+
 ### (I) Testing path: 
 We provided 3 trained models for testing. Users can used our models to detect Inosine and quantify editing rate on their own data.
-NOTE: Models 1 and 2 was trained using H9 and Xenopus Laevis data. Model 3 was trained using editing sites in H9, Xenopus Laevis, HCT116, Mus musculus (Mouse) and synthetic RNAs.
+
+**NOTE**: Models 1 and 2 was trained using H9 and Xenopus Laevis data. Model 3 was trained using editing sites in H9, Xenopus Laevis, HCT116, Mus musculus (Mouse) and synthetic RNAs.
 
 #### (5) Transform 1D into 2D data + Label data (class 0, 1 and 2 for unmodified, Inosine and SNP AG)
 	Scripts:
@@ -167,9 +170,13 @@ NOTE: Models 1 and 2 was trained using H9 and Xenopus Laevis data. Model 3 was t
 
 
 ### (II) Training path: 
+
 We allow users to train models using their own data. Depends on size of data set, number of epochs, batch size and GPU type, time requires for training is different.
+
 For our data: model 3 was trained using 265,631 positions with 893,865 matrices, on GPU Tesla V100-SXM2-32GB with batch size = 1024. Time for 1 epoch is 42 seconds and there were 900 epochs.
-**NOTE 1**: User should make sure the training data set is balance between 3 classes, especially class 0 (unmod) and class 1 (Inosine or other modifications). Number of matrices for training set for each model should not fall below 50,000.  
+
+**NOTE 1**: User should make sure the training data set is balance between 3 classes, especially class 0 (unmod) and class 1 (Inosine or other modifications). Number of matrices for training set for each model should not fall below 50,000. 
+ 
 **NOTE 2**: Ground truth for training path must have 5 columns: contig, position, strand (p for positive and n for negative), edit (0,1 and 2), rate (editing rate 0-1 for class 1 and -1 for class 0 and 2) (Example: /Dinopore/code/misc/Example_ground_truth_training.txt)
 
 #### (5) Transform 1D into 2D data + Label data (class 0, 1 and 2 for unmodified, Inosine and SNP AG) + Split into training and validation/testing data set
