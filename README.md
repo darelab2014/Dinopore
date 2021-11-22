@@ -1,5 +1,6 @@
 # DInoPORE
 
+##OVERVIEW
 DInoPORE is a computational method, used to detect Inosine and quantify modified frequencies from direct RNA Nanopore sequencing.
 
 This GitHub repository only provide code to run DInoPORE, including testing and training path.
@@ -14,7 +15,7 @@ Environment build time is approximately 15 minutes.
 
 =====================================================================================
 
-REQUISITE SOFTWARE
+##REQUISITE SOFTWARE
 
 Guppy_basecaller 3.2.4 (Please modify S1.Basecall_map_nanopolish.sh to point to it)
 
@@ -59,7 +60,7 @@ DInoPORE has been tested on CentOS Linux 7 and Ubuntu 20.04.
 
 =====================================================================================
 
-INSTALLATION
+##INSTALLATION
 
 conda create -n myenv python=3.8.5 h5py=2.10.0 nanopolish=0.11.1 pillow=8.3.1 pyyaml=5.4.1 requests=2.26.0 samtools=1.9 scipy=1.7.1 
 
@@ -67,7 +68,7 @@ conda activate myenv
 
 =====================================================================================
 
-USAGE
+##USAGE
 
 bash mainscript.sh -e <path/to/exptdir> -r <path/to/ref.fa> -n <num_threads> -g <aggregationGroup> -c <classReference>
 
@@ -95,10 +96,10 @@ i.e.
 
 =====================================================================================
 
-DOCUMENTATION
+##DOCUMENTATION
 Steps:
 
-(1) Basecall fast5 -> map to genome reference -> run nanopolish to extract signal
+###(1) Basecall fast5 -> map to genome reference -> run nanopolish to extract signal
 	Script:
 	S1.Basecall_map_nanopolish.sh (input: $exptdir $ref $numcore)
 	
@@ -109,7 +110,7 @@ Steps:
 	${exptdir}/out_nanopolish/$expt.gm2.nanopolish_eventAlignOut.txt
 
 
-(2) Process data: convert bam file to tsv and combine nanopolish into single signal for each 5-mer of a read
+###(2) Process data: convert bam file to tsv and combine nanopolish into single signal for each 5-mer of a read
 	Scripts:
 	S2.Process_bam_nnpl.sh (input: $exptdir $ref $numcore)
 	└── s2.Sam2tsv_processtsv.sh
@@ -121,7 +122,7 @@ Steps:
 	${exptdir}/raw_features/$expt.gm2.nanopolish_eventAlignOut_combined.txt
 
 
-(3) Combine bam-tsv file and combined nanopolish file to generate raw features table
+###(3) Combine bam-tsv file and combined nanopolish file to generate raw features table
 	Scripts:
 	S3.Generate_raw_features.sh (input: $exptdir $numcore $agggrp)
 	└── S3.Generate_raw_features.sh
@@ -131,7 +132,7 @@ Steps:
 	$(dirname $exptdir)/aggregate_reads/${expt}.tsv_nnpl_inAE.txt_grp${agggrp}
 
 
-(4) Aggregate features of reads into positions
+###(4) Aggregate features of reads into positions
 	Scripts:
 	S4.Aggregate_reads_into_pos.sh (input: $exptdir $numcore $agggrp)
 		└── s4.Aggregating_reads_pos.R
@@ -141,11 +142,12 @@ Steps:
 
 	Note: This script can be run on any number of runs and will determine how reads across runs (if applicable) are aggregated before passing into the CNN model.
 
-From step 5 onwards, there are 2 paths: training and testing.
-(I) For testing path: we provided 3 trained models for testing. Users can used our models to detect Inosine and quantify editing rate on their own data.
+**From step 5 onwards, there are 2 paths: training and testing.**
+###(I) Testing path: 
+We provided 3 trained models for testing. Users can used our models to detect Inosine and quantify editing rate on their own data.
 NOTE: Models 1 and 2 was trained using H9 and Xenopus Laevis data. Model 3 was trained using editing sites in H9, Xenopus Laevis, HCT116, Mus musculus (Mouse) and synthetic RNAs.
 
-(5) Transform 1D into 2D data + Label data (class 0, 1 and 2 for unmodified, Inosine and SNP AG)
+####(5) Transform 1D into 2D data + Label data (class 0, 1 and 2 for unmodified, Inosine and SNP AG)
 	Scripts:
 	S5.Transform_dim.sh (input:  $exptdir $numcore $agggrp $classref)
 		└── s5.Preprocess_data_matrix_inputCNN.R
@@ -154,7 +156,7 @@ NOTE: Models 1 and 2 was trained using H9 and Xenopus Laevis data. Model 3 was t
 	$(dirname $exptdir)/matrix_CNN/$agggrp.morefts.input_CNN_regression_modgen.RData
 	
 	
-(6) Predict testing data using Dinopore models + Plot ROC and PR curves for the result
+####(6) Predict testing data using Dinopore models + Plot ROC and PR curves for the result
 	S6.Predict.sh (input: $exptdir $agggrp $numcore $classref)
 		└── s6.Predict_test_data.R
 	
@@ -164,12 +166,13 @@ NOTE: Models 1 and 2 was trained using H9 and Xenopus Laevis data. Model 3 was t
 	$(dirname $exptdir)/matrix_CNN/$agggrp.output_prediction_CNN_class2.txt
 
 
-(II) For training path: we allow users to train models using their own data. Depends on size of data set, number of epochs, batch size and GPU type, time requires for training is different.
+###(II) Training path: 
+We allow users to train models using their own data. Depends on size of data set, number of epochs, batch size and GPU type, time requires for training is different.
 For our data: model 3 was trained using 265,631 positions with 893,865 matrices, on GPU Tesla V100-SXM2-32GB with batch size = 1024. Time for 1 epoch is 42 seconds and there were 900 epochs.
-NOTE 1: User should make sure the training data set is balance between 3 classes, especially class 0 (unmod) and class 1 (Inosine or other modifications). Number of matrices for training set for each model should not fall below 50,000.  
-NOTE 2: Ground truth for training path must have 5 columns: contig, position, strand (p for positive and n for negative), edit (0,1 and 2), rate (editing rate 0-1 for class 1 and -1 for class 0 and 2) (Example: /Dinopore/code/misc/Example_ground_truth_training.txt)
+**NOTE 1**: User should make sure the training data set is balance between 3 classes, especially class 0 (unmod) and class 1 (Inosine or other modifications). Number of matrices for training set for each model should not fall below 50,000.  
+**NOTE 2**: Ground truth for training path must have 5 columns: contig, position, strand (p for positive and n for negative), edit (0,1 and 2), rate (editing rate 0-1 for class 1 and -1 for class 0 and 2) (Example: /Dinopore/code/misc/Example_ground_truth_training.txt)
 
-(5) Transform 1D into 2D data + Label data (class 0, 1 and 2 for unmodified, Inosine and SNP AG) + Split into training and validation/testing data set
+####(5) Transform 1D into 2D data + Label data (class 0, 1 and 2 for unmodified, Inosine and SNP AG) + Split into training and validation/testing data set
 	Scripts:
 	S5.Train_transform_dim.sh (input:  $exptdir $numcore $agggrp $classref)
 		└── s5.Train_preprocess_data_matrix_inputCNN_train_val.R
@@ -178,7 +181,7 @@ NOTE 2: Ground truth for training path must have 5 columns: contig, position, st
 	$(dirname $exptdir)/matrix_CNN/$agggrp.validation_matrix.rds
 	$(dirname $exptdir)/matrix_CNN/$agggrp.training_matrix.rds
 	
-(6a) Train 3-class classification model
+####(6a) Train 3-class classification model
 	Scripts:
 	S6a.Train_model1.sh (input:  $exptdir $agggrp $epoch $batch $seed)
 		└── s6a.Training_classification_model_3class.R
@@ -186,7 +189,7 @@ NOTE 2: Ground truth for training path must have 5 columns: contig, position, st
 	Output:
 	$(dirname $exptdir)/matrix_CNN/$agggrp.best_pos5_mix_3class_resnet.h5
 	
-(6b) Train 2-class classification model
+####(6b) Train 2-class classification model
 	Scripts:
 	S6b.Train_model2.sh (input:  $exptdir $agggrp $epoch $batch $seed)
 		└── s6b.Training_classification_model_2class.R
@@ -194,7 +197,7 @@ NOTE 2: Ground truth for training path must have 5 columns: contig, position, st
 	Output:
 	$(dirname $exptdir)/matrix_CNN/$agggrp.best_pos5_mix_3c_1vs1_resnet.h5
 	
-(6c) Train regression model
+####(6c) Train regression model
 	Scripts:
 	S6c.Train_model3.sh (input:  $exptdir $agggrp $epoch $batch $seed)
 		└── s6c.Training_regression_model.R
@@ -202,7 +205,7 @@ NOTE 2: Ground truth for training path must have 5 columns: contig, position, st
 	Output:
 	$(dirname $exptdir)/matrix_CNN/$agggrp.best_regression_morefts_16384_1024_asin06.h5
 	
-(7) Predict testing data using trained models in step 6a, 6b and 6c
+####(7) Predict testing data using trained models in step 6a, 6b and 6c
 	S7.Predict.sh (input: $exptdir $numcore $agggrp)
 		└── s7.Predict_test_data_using_trained_models.R
 	
