@@ -2,7 +2,6 @@ pacman::p_load(data.table,tidyverse,caret,stringr,keras,tensorflow, optparse, mu
 
 rm(list=ls())
 gc()
-Rcpp::sourceCpp("all_functions.cpp")
 
 args <- commandArgs(trailingOnly=TRUE)
 
@@ -11,9 +10,9 @@ option_list = list(
               help="input file name", metavar="character"),
   make_option(c("-t", "--thread"), type="integer", default=1,
               help="ground truth of class for coordinates", metavar="character"),
-  make_option(c("-m3", "--model3c"), type="character", default=NULL,
+  make_option(c("-m", "--model3c"), type="character", default=NULL,
               help="3-class model name", metavar="character"),
-  make_option(c("-m2", "--model2c"), type="character", default=NULL,
+  make_option(c("-M", "--model2c"), type="character", default=NULL,
               help="2-class model name", metavar="character"),
   make_option(c("-r", "--regmodel"), type="character", default=NULL,
               help="regression model name", metavar="character")
@@ -24,8 +23,20 @@ opt = parse_args(opt_parser)
 
 if (is.null(opt$input)| is.null(opt$model3c)|is.null(opt$model2c)|is.null(opt$regmodel)){
   print_help(opt_parser)
-  stop("Input files, 3-class model, 2-class model and regression model must be supplied (-i,-m3,-m2,-r).", call.=FALSE)
+  stop("Input files, 3-class model, 2-class model and regression model must be supplied (-i,-m,-M,-r).", call.=FALSE)
 }
+
+getdinodir <- function(){
+    commandArgs() %>%
+       tibble::enframe(name=NULL) %>%
+       tidyr::separate(col=value, into=c("key", "value"), sep="=", fill='right') %>%
+       dplyr::filter(key == "--file") %>%
+       dplyr::pull(value) %>%
+       word(., start=1, end=-3, sep="/")
+}
+dinodir <- getdinodir()
+
+Rcpp::sourceCpp(paste0(dinodir,"/code/all_functions.cpp"))
 
 chrmapping <- readRDS("chrmapping.rds")
 
@@ -34,12 +45,14 @@ model2=load_model_hdf5(opt$model2c)
 model3=load_model_hdf5(opt$regmodel)
 
 test=readRDS(opt$input)
-
+test$xc=test$x[,,c(1:43),]
+test$xc=array_reshape(test$xc,dim=c(nrow(test$x),5,43,1))
 agggrp <- word(opt$input,sep = "\\.", 1)
 
 k_set_learning_phase(0)
 
-pred <- predict(model1,test$x[,,c(1:43),])
+pred <- predict(model1,test$xc)
+print("model 1")
 pred <- as.data.frame(pred)
 
 pred_test <- colnames(pred[,c(1:3)])[apply(pred[,c(1:3)],1,which.max)]
@@ -53,7 +66,8 @@ pred$n2=1-pred$V3
 pred$c1=0
 pred$c2=0
 
-pred2 <- predict(model2,test$x[c01,,c(1:43),])
+pred2 <- predict(model2,test$xc[c01,,,])
+print("model 2")
 pred2 <- as.data.frame(pred2)
 
 pred[c01,c(5,6)] <- pred2
@@ -79,6 +93,7 @@ pred.2modelcov40 <- pred.2model %>% filter(cov >= 40)
 id=pred.2modelcov40$id[pred.2modelcov40$pred %in% c("1")]
 ind=which(test$info[,"id"] %in% id)
 pred3 <- predict(model3,0.01*test$x[ind,,,])
+print("model 3")
 
 pred.regression <- data.frame('id'=(test$info[ind,"id"]),
                               'cov'=test$info[ind,"cov"],

@@ -2,7 +2,6 @@ pacman::p_load(data.table,tidyverse,caret,stringr,keras,tensorflow, optparse, mu
 
 rm(list=ls())
 gc()
-Rcpp::sourceCpp("/code/all_functions.cpp")
 
 args <- commandArgs(trailingOnly=TRUE)
 
@@ -13,8 +12,6 @@ option_list = list(
               help="training file name", metavar="character"),
   make_option(c("-o", "--name"), type="character", default="out",
               help="common name for model", metavar="character"),
-  make_option(c("-t", "--thread"), type="integer", default=1,
-              help="Number of cores allocated", metavar="integer"),
   make_option(c("-e", "--epoch"), type="integer", default=900,
               help="Number of epochs", metavar="integer"),
   make_option(c("-b", "--batch"), type="integer", default=1024,
@@ -30,6 +27,18 @@ if (is.null(opt$vali)|is.null(opt$train)){
   print_help(opt_parser)
   stop("Validation/testing and training files must be supplied (-v & -t).", call.=FALSE)
 }
+
+getdinodir <- function(){
+    commandArgs() %>%
+       tibble::enframe(name=NULL) %>%
+       tidyr::separate(col=value, into=c("key", "value"), sep="=", fill='right') %>%
+       dplyr::filter(key == "--file") %>%
+       dplyr::pull(value) %>%
+       word(., start=1, end=-3, sep="/")
+}
+dinodir <- getdinodir()
+
+Rcpp::sourceCpp(paste0(dinodir,"/code/all_functions.cpp"))
 
 train=readRDS(opt$train)
 vali=readRDS(opt$vali)

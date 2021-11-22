@@ -2,7 +2,6 @@ pacman::p_load(data.table,tidyverse,caret,stringr,keras,tensorflow, optparse, mu
 
 rm(list=ls())
 gc()
-Rcpp::sourceCpp("all_functions.cpp")
 
 args <- commandArgs(trailingOnly=TRUE)
 
@@ -13,8 +12,6 @@ option_list = list(
               help="training file name", metavar="character"),
   make_option(c("-o", "--name"), type="character", default="out",
               help="common name for model", metavar="character"),
-  make_option(c("-t", "--thread"), type="integer", default=1,
-              help="Number of cores allocated", metavar="integer"),
   make_option(c("-e", "--epoch"), type="integer", default=500,
               help="Number of epochs", metavar="integer"),
   make_option(c("-b", "--batch"), type="integer", default=256,
@@ -23,7 +20,7 @@ option_list = list(
               help="Seed number", metavar="integer")
 )
 
-opt_parser <- OptionParser(option_list=option_list,add_help_option=FALSE)
+opt_parser <- OptionParser(option_list=option_list, add_help_option=FALSE)
 opt = parse_args(opt_parser)
 
 if (is.null(opt$vali)|is.null(opt$train)){
@@ -31,8 +28,24 @@ if (is.null(opt$vali)|is.null(opt$train)){
   stop("Validation/testing and training files must be supplied (-v & -t).", call.=FALSE)
 }
 
+getdinodir <- function(){
+    commandArgs() %>%
+       tibble::enframe(name=NULL) %>%
+       tidyr::separate(col=value, into=c("key", "value"), sep="=", fill='right') %>%
+       dplyr::filter(key == "--file") %>%
+       dplyr::pull(value) %>%
+       word(., start=1, end=-3, sep="/")
+}
+dinodir <- getdinodir()
+
+Rcpp::sourceCpp(paste0(dinodir,"/code/all_functions.cpp"))
+
 train=readRDS(opt$train)
+train$x=train$x[,,c(1:43),]
+train$x=array_reshape(train$x,dim=c(nrow(train$x),5,43,1))
 vali=readRDS(opt$vali)
+vali$x=vali$x[,,c(1:43),]
+vali$x=array_reshape(vali$x,dim=c(nrow(vali$x),5,43,1))
 
 reset_keras=function(){
   sess=tf$compat$v1$keras$backend$get_session()
@@ -103,14 +116,14 @@ cl2=which(train$y==2)
 train2=list()
 train2$x=train$x[-cl2,,,]
 train2$y=train$y[-cl2]
-train2$x=array_reshape(train2$x,dim=c(length(train2$y),5,65,1))
+train2$x=array_reshape(train2$x,dim=c(length(train2$y),5,43,1))
 train2$info=train$info[-cl2,]
 
 cl2=which(vali$y==2)
 vali2=list()
 vali2$x=vali$x[-cl2,,,]
 vali2$y=vali$y[-cl2]
-vali2$x=array_reshape(vali2$x,dim=c(length(vali2$y),5,65,1))
+vali2$x=array_reshape(vali2$x,dim=c(length(vali2$y),5,43,1))
 vali2$info=vali$info[-cl2,]
 
 train_lab <-to_categorical(train2$y,2) #Catagorical vector for training classes
@@ -130,10 +143,10 @@ model1 %>% compile(
 save.checkpoint=callback_model_checkpoint(paste0(opt$name,'.best_pos5_mix_3c_1vs1_resnet.h5'),monitor = "val_accuracy",save_best_only = T,mode="auto")
 
 history <- model1 %>% fit(
-  x=train2$x[,,c(1:43),], y=train_lab, 
+  x=train2$x, y=train_lab, 
   epochs = opt$epoch, batch_size = opt$batch,  
   callbacks = save.checkpoint,
-  validation_data=list(vali2$x[,,c(1:43),],vali_lab),
+  validation_data=list(vali2$x,vali_lab),
   class_weight=list('0'=0.8,'1'=1.8)
 )
 

@@ -1,23 +1,22 @@
 #!/bin/bash
 
-rpath=/code/s5.Preprocess_data_matrix_inputCNN_train_val.R
-exptdir=$1
+codedir=$(cd `dirname $0` && pwd)
+
+rpath=${codedir}/s5.Train_preprocess_data_matrix_inputCNN_train_val.R
+inputdir=$1
 numcore=$2
-agggrp=$3
+groupName=$3
 classref=$4
-input=$agggrp.Agg.morefts.10bin.inML.txt
-output=$agggrp
 
-cnndir=$(dirname $exptdir)/matrix_CNN
+input=$groupName.Agg.morefts.10bin.inML.txt
+output=$groupName
 
-cd $cnndir
+cd $inputdir
 
 echo =========================================================================================
 echo "S5 Start: $(date)"
 
 Rscript $rpath -t $numcore -i $input -o $output -c $classref 
 
-#cp $output /results/S5_$output
-
-echo -e S5 End: $(date) "\n"
+echo -e "S5 End: $(date) \n"
 echo =========================================================================================
