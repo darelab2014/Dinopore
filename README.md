@@ -177,7 +177,7 @@ For our data: model 3 was trained using 265,631 positions with 893,865 matrices,
 
 **NOTE 1**: User should make sure the training data set is balance between 3 classes, especially class 0 (unmod) and class 1 (Inosine or other modifications). Number of matrices for training set for each model should not fall below 50,000. 
  
-**NOTE 2**: Ground truth for training path must have 5 columns: contig, position, strand (p for positive and n for negative), edit (0,1 and 2), rate (editing rate 0-1 for class 1 and -1 for class 0 and 2) (Example: /Dinopore/code/misc/Example_ground_truth_training.txt)
+**NOTE 2**: Ground truth for training path must have 5 columns: contig, position, strand (p for positive and n for negative), edit (0,1 and 2), and rate (editing rate 0-1 for class 1 and -1 for class 0 and 2) (Example: /Dinopore/code/misc/Example_ground_truth_training.txt)
 
 #### (5) Transform 1D into 2D data + Label data (class 0, 1 and 2 for unmodified, Inosine and SNP AG) + Split into training and validation/testing data set
 	Scripts:
