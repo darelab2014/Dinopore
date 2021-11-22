@@ -5,9 +5,11 @@ expt=$2
 exptdir=$3
 numcore=$4
 
+codedir=$(cd `dirname $0` && pwd)
+
 cd $npdir
 
-rpath=/code/s2.Combine_raw_nanopolish.R
+rpath=${codedir}/s2.Combine_raw_nanopolish.R
 file=${exptdir}/out_nanopolish/${expt}.gm2.nanopolish_eventAlignOut.txt
 head -n 1 $file > raw_nanopolish.header
 noline=$(wc -l $file | cut -d " " -f 1)
@@ -50,7 +52,7 @@ do
 
 done
 
-cat /code/misc/nnpl.header > $out
+cat ${codedir}/misc/nnpl.header > $out
 cat ${out}.part* | grep -v contig >> $out
 
 rm tmp.nnpl ${out}.part*

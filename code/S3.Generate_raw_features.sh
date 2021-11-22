@@ -4,7 +4,9 @@ exptdir=$1
 numcore=$2
 agggrp=$3
 
-rpath=/code/s3.Generate_raw_feature_table.R
+codedir=$(cd `dirname $0` && pwd)
+
+rpath=${codedir}/s3.Generate_raw_feature_table.R
 expt=$(basename ${exptdir})
 ftdir=${exptdir}/raw_features
 cd $ftdir
@@ -42,8 +44,8 @@ do
 	chk=$(wc -l readstmp | cut -f 1 -d " ")
 	
 	if [ $chk -gt 0 ]; then
-		cat /code/misc/nnpl.header > $innnpl
-		cat /code/misc/tsv.header > $intsv
+		cat ${codedir}/misc/nnpl.header > $innnpl
+		cat ${codedir}/misc/tsv.header > $intsv
 
 		LC_ALL=C grep -h -F -w -f readstmp $tsv >> $intsv
 		LC_ALL=C grep -h -F -w -f readstmp $nnpl >> $innnpl
@@ -61,7 +63,7 @@ do
 	fi	
 done
 
-cat /code/misc/inae.header > $outname
+cat ${codedir}/misc/inae.header > $outname
 cat ${outname}.part*.positive | LC_ALL=C sort -k1,1 -k3,3n | grep -v contig >> $outname
 cat ${outname}.part*.negative | LC_ALL=C sort -k1,1 -k3,3n | grep -v contig >> $outname
 

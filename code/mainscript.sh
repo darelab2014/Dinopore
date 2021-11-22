@@ -1,12 +1,13 @@
 #!/usr/bin/env bash
-set -ex
+set -e
 
 # This is the master script for the capsule. When you click "Reproducible Run", the code in this file will execute.
-								
 
-export SAM2TSV='java -jar /code/misc/sam2tsv.jar'
-export PICARD='java -jar /code/misc/picard.jar'
-export graphmap2='/code/misc/graphmap2'
+codedir="/home/s190075/dinoporegit/code"
+
+export SAM2TSV="java -jar ${codedir}/misc/sam2tsv.jar"
+export PICARD="java -jar ${codedir}/misc/picard.jar"
+export graphmap2="${codedir}/misc/graphmap2"
 
 chmod 744 $graphmap2
 delfastq=n
@@ -111,19 +112,19 @@ fi
 
 
 #Step 1 - Basecall fast5 -> map to genome reference -> run nanopolish to extract signal
-sh ./S1.Basecall_map_nanopolish.sh $exptdir $ref $numcore $delfastq
+sh ${codedir}/S1.Basecall_map_nanopolish.sh $exptdir $ref $numcore $delfastq
 
 #Step 2 - Process data: convert bam file to tsv and combine nanopolish into single signal for each 5-mer of a read
-sh ./S2.Process_bam_nnpl.sh $exptdir $ref $numcore
+sh ${codedir}/S2.Process_bam_nnpl.sh $exptdir $ref $numcore
 
 #Step 3 - Combine bam-tsv file and combined nanopolish file to generate raw features table
-sh ./S3.Generate_raw_features.sh $exptdir $numcore $agggrp
+sh ${codedir}/S3.Generate_raw_features.sh $exptdir $numcore $agggrp
 
 #Step 4 - Aggregate features of reads into positions
-sh ./S4.Aggregate_reads_into_pos.sh $exptdir $numcore $agggrp
+sh ${codedir}/S4.Aggregate_reads_into_pos.sh $exptdir $numcore $agggrp
 
 #Step 5 - Transform 1D into 2D data + Label data (class 0, 1 and 2 for unmodified, Inosine and SNP AG)
-sh ./S5.Transform_dim.sh $exptdir $numcore $agggrp $classref
+sh ${codedir}/S5.Transform_dim.sh $exptdir $numcore $agggrp $classref
 
 #Step 6 - Predict testing data using Dinopore models + Plot ROC and PR curves for the result
-sh ./S6.Predict.sh $exptdir $agggrp $numcore
+sh ${codedir}/S6.Predict.sh $exptdir $agggrp $numcore

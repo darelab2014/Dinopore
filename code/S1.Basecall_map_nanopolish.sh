@@ -38,11 +38,11 @@ cd $fqdir
 #cat *.fastq > $fqCombined
 #echo All fastq have been combined.
 
-#if [ "$delfastq" = "y" ]; then
-#  find . -maxdepth 1 -type f -name '*.fastq' -a ! -name '*.combined.fastq' -delete
-#elif [ "$delfastq" = "n" ]; then
-#  echo "Base-called FASTQ files preserved. Proceeding to map reads."
-#fi																					
+if [ "$delfastq" = "y" ]; then
+ find . -maxdepth 1 -type f -name '*.fastq' -a ! -name '*.combined.fastq' -delete
+elif [ "$delfastq" = "n" ]; then
+ echo "Base-called FASTQ files preserved. Proceeding to map reads."
+fi																					
 
 #Step 3 - Map to reference genome. Generates sam file.
 sed -i 's/U/T/g' $fqCombined

@@ -3,6 +3,9 @@
 exptdir=$1
 ref=$2
 numcore=$3
+
+codedir=$(cd `dirname $0` && pwd)
+
 expt=$(basename ${exptdir})
 fqdir=${exptdir}/out_fastq_bam
 npdir=${exptdir}/out_nanopolish
@@ -21,10 +24,10 @@ else
 fi
 
 #Step 2 - Run sam2tsv and process tsv file
-sh ./s2.Sam2tsv_processtsv.sh $fqdir $expt $exptdir $ref $numcore
+sh ${codedir}/s2.Sam2tsv_processtsv.sh $fqdir $expt $exptdir $ref $numcore
 
 #Part 2 - process raw nanopolish file
-sh ./s2.Combine_raw_nnpl.sh $npdir $expt $exptdir $numcore
+sh ${codedir}/s2.Combine_raw_nnpl.sh $npdir $expt $exptdir $numcore
 
 echo -e S2 End: $(date) "\n"
 echo =========================================================================================

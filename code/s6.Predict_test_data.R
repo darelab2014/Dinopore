@@ -2,7 +2,6 @@ pacman::p_load(data.table,tidyverse,caret,stringr,keras,tensorflow, optparse, mu
 
 rm(list=ls())
 gc()
-Rcpp::sourceCpp("/code/all_functions.cpp")
 
 args <- commandArgs(trailingOnly=TRUE)
 
@@ -20,12 +19,23 @@ if (is.null(opt$input)){
   print_help(opt_parser)
   stop("Input file must be supplied (-i).", call.=FALSE)
 }
+getdinodir <- function(){
+    commandArgs() %>%
+       tibble::enframe(name=NULL) %>%
+       tidyr::separate(col=value, into=c("key", "value"), sep="=", fill='right') %>%
+       dplyr::filter(key == "--file") %>%
+       dplyr::pull(value) %>%
+       word(., start=1, end=-3, sep="/")
+}
+dinodir <- getdinodir()
+
+Rcpp::sourceCpp(paste0(dinodir,"/code/all_functions.cpp"))
 
 chrmapping <- readRDS("chrmapping.rds")
 
-model1=load_model_hdf5("/data/model/best_pos5_mix_3class_resnet_1992.h5")
-model2=load_model_hdf5("/data/model/best_pos5_mix_3c_1vs1_3010_resnet_10.h5")
-model3=load_model_hdf5("/data/model/best_regression_mixnHEK_morefts_16384_1024_b1024_init_650k_XHe0_Mus_asin06.h5")
+model1=load_model_hdf5(paste0(dinodir, "/model/best_pos5_mix_3class_resnet_1992.h5"))
+model2=load_model_hdf5(paste0(dinodir, "/model/best_pos5_mix_3c_1vs1_3010_resnet_10.h5"))
+model3=load_model_hdf5(paste0(dinodir, "/model/best_regression_mixnHEK_morefts_16384_1024_b1024_init_650k_XHe0_Mus_asin06.h5"))
 
 load(opt$input)
 

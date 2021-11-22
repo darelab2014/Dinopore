@@ -2,7 +2,7 @@ pacman::p_load(data.table,tidyverse,Matrix,caret,Rcpp,usefun,scales,keras,abind,
 
 rm(list=ls())
 gc()
-Rcpp::sourceCpp("/code/all_functions.cpp")
+
 options(scipen=999)
 
 args <- commandArgs(trailingOnly=TRUE)
@@ -25,6 +25,20 @@ if (is.null(opt$input)|is.null(opt$out)|is.null(opt$classref)){
   print_help(opt_parser)
   stop("Input files must be supplied (-i,-o, -c).", call.=FALSE)
 }
+
+getdinodir <- function(){
+    commandArgs() %>%
+       tibble::enframe(name=NULL) %>%
+       tidyr::separate(col=value, into=c("key", "value"), sep="=", fill='right') %>%
+       dplyr::filter(key == "--file") %>%
+       dplyr::pull(value) %>%
+       word(., start=1, end=-3, sep="/")
+}
+dinodir <- getdinodir()
+
+Rcpp::sourceCpp(paste0(dinodir,"/code/all_functions.cpp"))
+
+load(paste0(dinodir, "/code/misc/minmax_Xen_5pos_012_10bin_morefts_combine.RData"))
 
 generate_before_after <- function(x){
   x=as.data.frame(x)
@@ -193,7 +207,7 @@ dat[,c("event_stdv.m","event_stdv.s","event_stdv.A","count.m","count.s","ins3.m"
 dat=dat[,-c(30:34,51:55)]
 dat=dat[complete.cases(dat),]
 dat=as.data.frame(dat)
-load("/code/misc/minmax_Xen_5pos_012_10bin_morefts_combine.RData")
+
 col=colnames(dat)[8:72]
 for (i in 1:length(col)){
   dat[,col[i]]=((dat[,col[i]]-mm.df[mm.df$col==col[i],"min"])*100)/(mm.df[mm.df$col==col[i],"diff"])

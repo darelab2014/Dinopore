@@ -3,8 +3,6 @@ pacman::p_load(data.table,tidyverse,R.utils,plyr,doParallel,Rcpp,optparse)
 rm(list=ls())
 gc()
 
-Rcpp::sourceCpp("/code/all_functions.cpp")
-
 args <- commandArgs(trailingOnly=TRUE)
 
 option_list = list(
@@ -23,6 +21,18 @@ if (is.null(opt$out)|is.null(opt$regex)){
   print_help(opt_parser)
   stop("Input files must be supplied (-o,-r).", call.=FALSE)
 }
+
+getdinodir <- function(){
+    commandArgs() %>%
+       tibble::enframe(name=NULL) %>%
+       tidyr::separate(col=value, into=c("key", "value"), sep="=", fill='right') %>%
+       dplyr::filter(key == "--file") %>%
+       dplyr::pull(value) %>%
+       word(., start=1, end=-3, sep="/")
+}
+dinodir <- getdinodir()
+
+Rcpp::sourceCpp(paste0(dinodir,"/code/all_functions.cpp"))
 
 ###Functions###
 impute.mean <- function(x) replace(x, is.na(x), mean(x, na.rm = TRUE))

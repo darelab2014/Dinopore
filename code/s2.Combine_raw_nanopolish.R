@@ -32,7 +32,17 @@ if (is.null(opt$file) | is.null(opt$size)|is.null(opt$num)){
 no_cores=opt$thread
 registerDoParallel(no_cores)
 
-Rcpp::sourceCpp("/code/all_functions.cpp")
+getdinodir <- function(){
+    commandArgs() %>%
+       tibble::enframe(name=NULL) %>%
+       tidyr::separate(col=value, into=c("key", "value"), sep="=", fill='right') %>%
+       dplyr::filter(key == "--file") %>%
+       dplyr::pull(value) %>%
+       word(., start=1, end=-3, sep="/")
+}
+dinodir <- getdinodir()
+
+Rcpp::sourceCpp(paste0(dinodir,"/code/all_functions.cpp"))
 
 head=fread("raw_nanopolish.header")
 n=opt$num
