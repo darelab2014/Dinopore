@@ -85,9 +85,8 @@ bash mainscript.sh -e <path/to/exptdir> -r <path/to/ref.fa> -n <num_threads> -g 
 
 E.g. bash mainscript.sh -e /data/xen_s9_r1_50k -r /data/reference/xenLae2.fa -n 15 -g xen50k -c /data/xen_s9_r1_50k/groundtruth_classification.txt
 
-**NOTE**: mainscript.sh expects to find "fast5" directory within exptdir
+**NOTE**: mainscript.sh expects to find "fast5" directory within exptdir:
 ###
-	i.e. 
 	path/to/exptdir
 	└── fast5
 
@@ -180,6 +179,11 @@ For our data: model 3 was trained using 265,631 positions with 893,865 matrices,
 **NOTE 2**: Ground truth for training path must have 5 columns: contig, position, strand (p for positive and n for negative), edit (0,1 and 2), and rate (editing rate 0-1 for class 1 and -1 for class 0 and 2) (For example, see Dinopore/code/misc/Example_ground_truth_training.txt)
 
 **NOTE 3**: User should make sure number of epochs is at least 500 epochs for model 1 and model 2, and at least 900 epochs for model 3
+	
+**NOTE 4**: Scripts for training uses GPU. If users wish to use CPU for training, please remove the following lines of code:
+	s6a.Training_classification_model_3class.R - 58, 59
+	s6b.Training_classification_model_2class.R - 58, 59
+	s6c.Training_regression_model.R - 74, 75
 
 #### (5) Transform 1D into 2D data + Label data (class 0, 1 and 2 for unmodified, Inosine and SNP AG) + Split into training and validation/testing data set
 	Script(s):
