@@ -94,7 +94,7 @@ E.g. bash mainscript.sh -e /data/xen_s9_r1_50k -r /data/reference/xenLae2.fa -n 
 
 ## DOCUMENTATION
 
-### Run Mainscript.sh (Steps 1 to 3) on individual sequencing runs
+### Run Mainscript1.sh (Steps 1 to 3) on individual sequencing runs
 	
 #### (1) Basecall fast5 -> map to genome reference -> run nanopolish to extract signal
 	Script(s):
@@ -128,8 +128,8 @@ E.g. bash mainscript.sh -e /data/xen_s9_r1_50k -r /data/reference/xenLae2.fa -n 
 	Output:
 	$(dirname $exptdir)/aggregate_reads/${expt}.tsv_nnpl_inAE.txt_grp${agggrp}
 
-### Aggregate reads from single or multiple related runs (e.g. H9 Wildtype cell line)
-	
+### Run Mainscript2.sh (Steps 4 to 6)
+
 #### (4) Aggregate features of reads into positions
 	Script(s):
 	S4.Aggregate_reads_into_pos.sh (input: $exptdir $numcore $agggrp)
@@ -138,7 +138,7 @@ E.g. bash mainscript.sh -e /data/xen_s9_r1_50k -r /data/reference/xenLae2.fa -n 
 	Output:
 	$(dirname $exptdir)/matrix_CNN/$agggrp.Agg.morefts.10bin.inML.txt
 
-**NOTE**: This script aggregates all files in matrix_CNN that were processed with the same group name (-g) and generates one file per group for downstream processing.
+**NOTE**: This script aggregates all files in matrix_CNN that were processed with the same user-defined group name (-g) and generates one file per group for downstream processing.
 
 
 ### **From step 5 onwards, there are 2 paths: training and testing.**
