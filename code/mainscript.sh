@@ -121,10 +121,10 @@ sh ${codedir}/S2.Process_bam_nnpl.sh $exptdir $ref $numcore
 sh ${codedir}/S3.Generate_raw_features.sh $exptdir $numcore $agggrp
 
 #Step 4 - Aggregate features of reads into positions
-sh ${codedir}/S4.Aggregate_reads_into_pos.sh $exptdir $numcore $agggrp
+#sh ${codedir}/S4.Aggregate_reads_into_pos.sh $exptdir $numcore $agggrp
 
 #Step 5 - Transform 1D into 2D data + Label data (class 0, 1 and 2 for unmodified, Inosine and SNP AG)
-sh ${codedir}/S5.Transform_dim.sh $exptdir $numcore $agggrp $classref
+#sh ${codedir}/S5.Transform_dim.sh $exptdir $numcore $agggrp $classref
 
 #Step 6 - Predict testing data using Dinopore models + Plot ROC and PR curves for the result
-sh ${codedir}/S6.Predict.sh $exptdir $agggrp $numcore
+#sh ${codedir}/S6.Predict.sh $exptdir $agggrp $numcore
