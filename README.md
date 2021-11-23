@@ -1,17 +1,13 @@
-# DInoPORE
+# DInoPORE: Direct detection of INOsines in native RNA with nanoPORE sequencing
 
 ## OVERVIEW
-DInoPORE is a computational method, used to detect Inosine and quantify modified frequencies from direct RNA Nanopore sequencing.
+DInoPORE is a computational method to detect Adenosine-to-Inosine (A-to-I) editing sites from direct-RNA sequencing data. Editing sites identified will also have their editing rate estimated. 
 
-This GitHub repository only provide code to run DInoPORE, including testing and training path.
+This GitHub repository contains the scripts to run DInoPORE. Users who wish to train their own models using DInoPORE's architecture can also find the scripts for training (see training path section below).
 
-Sample dataset containing 53,283 direct-RNA-seq reads from Xenopus Laevis rep 1 stage 9 to illustrate how the pipeline runs and the typical runtime for a small sample can be found in Code Ocean capsule, DOI <Insert DOI>
-
-Rmarkdown files reproducing results from the manuscript can also be found in Code Ocean capsule /data/Rmarkdown.
+A sample dataset to illustrate how the pipeline runs and the typical runtime for a small sample can be found in DInoPORE's Code Ocean capsule, DOI <Insert DOI>. This dataset contains 53,283 direct-RNA-seq reads from Xenopus Laevis stage 9 rep 1. R Markdown files reproducing key results from the DInoPORE manuscript can also be found in the Code Ocean capsule under /data/Rmarkdown.
 
 Listed below are the computational environment and software used. Usage documentation can be found in the last section of this readme.
-
-Environment build time is approximately 15 minutes.
 
 =====================================================================================
 
@@ -44,7 +40,7 @@ R Packages (R version 4.1)
 - doParallel	1.0.16
 - ff			4.0.4
 - foreach		1.5.1
-- keras			2.6.1
+- keras			>= 2.3.0
 - multiROC		1.1.1
 - optparse		1.6.6
 - pacman		0.5.1
@@ -60,12 +56,12 @@ DInoPORE has been tested on CentOS Linux 7 and Ubuntu 20.04.
 
 =====================================================================================
 
-## INSTALLATION
+## INSTALLATION - Create conda env
 
 conda create -n myenv python=3.8.5 h5py=2.10.0 nanopolish=0.11.1 pillow=8.3.1 pyyaml=5.4.1 requests=2.26.0 samtools=1.9 scipy=1.7.1 
 
 conda activate myenv
-
+	
 =====================================================================================
 
 ## USAGE
@@ -97,9 +93,10 @@ i.e.
 =====================================================================================
 
 ## DOCUMENTATION
-Steps:
 
-### (1) Basecall fast5 -> map to genome reference -> run nanopolish to extract signal
+### Run Mainscript.sh (Steps 1 to 3) on individual sequencing runs
+	
+#### (1) Basecall fast5 -> map to genome reference -> run nanopolish to extract signal
 	Script:
 	S1.Basecall_map_nanopolish.sh (input: $exptdir $ref $numcore)
 	
@@ -110,7 +107,7 @@ Steps:
 	${exptdir}/out_nanopolish/$expt.gm2.nanopolish_eventAlignOut.txt
 
 
-### (2) Process data: convert bam file to tsv and combine nanopolish into single signal for each 5-mer of a read
+#### (2) Process data: convert bam file to tsv and combine nanopolish into single signal for each 5-mer of a read
 	Scripts:
 	S2.Process_bam_nnpl.sh (input: $exptdir $ref $numcore)
 	└── s2.Sam2tsv_processtsv.sh
@@ -122,7 +119,7 @@ Steps:
 	${exptdir}/raw_features/$expt.gm2.nanopolish_eventAlignOut_combined.txt
 
 
-### (3) Combine bam-tsv file and combined nanopolish file to generate raw features table
+#### (3) Combine bam-tsv file and combined nanopolish file to generate raw features table
 	Scripts:
 	S3.Generate_raw_features.sh (input: $exptdir $numcore $agggrp)
 	└── S3.Generate_raw_features.sh
@@ -131,8 +128,9 @@ Steps:
 	Output:
 	$(dirname $exptdir)/aggregate_reads/${expt}.tsv_nnpl_inAE.txt_grp${agggrp}
 
-
-### (4) Aggregate features of reads into positions
+### Aggregate reads from single or multiple related runs (e.g. H9 Wildtype cell line)
+	
+#### (4) Aggregate features of reads into positions
 	Scripts:
 	S4.Aggregate_reads_into_pos.sh (input: $exptdir $numcore $agggrp)
 		└── s4.Aggregating_reads_pos.R
@@ -171,15 +169,15 @@ We provided 3 trained models for testing. Users can used our models to detect In
 
 ### (II) Training path: 
 
-We allow users to train models, based on our architectures and use their own data. Depends on size of data set, number of epochs, batch size and GPU type, time requires for training is different.
+We allow users to train models using their own data, based on our models' architecture. Depending on size of data set, number of epochs, batch size and GPU type, time required for training will vary.
 
 For our data: model 3 was trained using 265,631 positions with 893,865 matrices, on GPU NVIDIA GeForce RTX3080 with batch size = 1024. Time for 1 epoch is 88 seconds and there were 900 epochs.
 
-**NOTE 1**: User should make sure the training data set is balance between 3 classes, especially class 0 (unmod) and class 1 (Inosine or other modifications). Number of matrices for training set should not fall below 50,000 for model 1 and 2 and not fall below 500,000 for model 3
+**NOTE 1**: User should make sure the training data set is balance between 3 classes, especially class 0 (unmod) and class 1 (Inosine or other modifications). Number of matrices for training set should be at least 50,000 for model 1 and model 2 and at least 500,000 for model 3
  
-**NOTE 2**: Ground truth for training path must have 5 columns: contig, position, strand (p for positive and n for negative), edit (0,1 and 2), and rate (editing rate 0-1 for class 1 and -1 for class 0 and 2) (Example: /Dinopore/code/misc/Example_ground_truth_training.txt)
+**NOTE 2**: Ground truth for training path must have 5 columns: contig, position, strand (p for positive and n for negative), edit (0,1 and 2), and rate (editing rate 0-1 for class 1 and -1 for class 0 and 2) (For example, see Dinopore/code/misc/Example_ground_truth_training.txt)
 
-**NOTE 3**: User should make sure number of epochs not less than 500 epochs for model 1 and 2, and not less than 900 epochs for model 3
+**NOTE 3**: User should make sure number of epochs is at least 500 epochs for model 1 and model 2, and at least 900 epochs for model 3
 
 #### (5) Transform 1D into 2D data + Label data (class 0, 1 and 2 for unmodified, Inosine and SNP AG) + Split into training and validation/testing data set
 	Scripts:
@@ -187,8 +185,8 @@ For our data: model 3 was trained using 265,631 positions with 893,865 matrices,
 		└── s5.Train_preprocess_data_matrix_inputCNN_train_val.R
 		
 	Output:
-	$(dirname $exptdir)/matrix_CNN/$agggrp.validation_matrix.rds
-	$(dirname $exptdir)/matrix_CNN/$agggrp.training_matrix.rds
+	$agggrp.validation_matrix.rds
+	$agggrp.training_matrix.rds
 	
 #### (6a) Train 3-class classification model
 	Scripts:
@@ -196,7 +194,7 @@ For our data: model 3 was trained using 265,631 positions with 893,865 matrices,
 		└── s6a.Training_classification_model_3class.R
 		
 	Output:
-	$(dirname $exptdir)/matrix_CNN/$agggrp.best_pos5_mix_3class_resnet.h5
+	$agggrp.best_pos5_mix_3class_resnet.h5
 	
 #### (6b) Train 2-class classification model
 	Scripts:
@@ -204,7 +202,7 @@ For our data: model 3 was trained using 265,631 positions with 893,865 matrices,
 		└── s6b.Training_classification_model_2class.R
 		
 	Output:
-	$(dirname $exptdir)/matrix_CNN/$agggrp.best_pos5_mix_3c_1vs1_resnet.h5
+	$agggrp.best_pos5_mix_3c_1vs1_resnet.h5
 	
 #### (6c) Train regression model
 	Scripts:
@@ -212,13 +210,14 @@ For our data: model 3 was trained using 265,631 positions with 893,865 matrices,
 		└── s6c.Training_regression_model.R
 		
 	Output:
-	$(dirname $exptdir)/matrix_CNN/$agggrp.best_regression_morefts_16384_1024_asin06.h5
+	$agggrp.best_regression_morefts_16384_1024_asin06.h5
 	
 #### (7) Predict testing data using trained models in step 6a, 6b and 6c
 	S7.Predict.sh (input: $exptdir $numcore $agggrp)
 		└── s7.Predict_test_data_using_trained_models.R
 	
 	Output:
-	$(dirname $exptdir)/matrix_CNN/$agggrp.output_prediction_CNN_class0.txt
-	$(dirname $exptdir)/matrix_CNN/$agggrp.output_prediction_CNN_class1.txt
-	$(dirname $exptdir)/matrix_CNN/$agggrp.output_prediction_CNN_class2.txt
+	$agggrp.output_prediction_CNN_class0.txt
+	$agggrp.output_prediction_CNN_class1.txt
+	$agggrp.output_prediction_CNN_class2.txt
+	
