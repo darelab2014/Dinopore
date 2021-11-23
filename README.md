@@ -138,7 +138,7 @@ i.e.
 	Output:
 	$(dirname $exptdir)/matrix_CNN/$agggrp.Agg.morefts.10bin.inML.txt
 
-	**NOTE**: This script aggregates all files in matrix_CNN that were processed with the same group name (-g) and generates one file per group for downstream processing.
+**NOTE**: This script aggregates all files in matrix_CNN that were processed with the same group name (-g) and generates one file per group for downstream processing.
 
 
 ### **From step 5 onwards, there are 2 paths: training and testing.**
