@@ -85,7 +85,7 @@ bash mainscript.sh -e <path/to/exptdir> -r <path/to/ref.fa> -n <num_threads> -g 
 
 E.g. bash mainscript.sh -e /data/xen_s9_r1_50k -r /data/reference/xenLae2.fa -n 15 -g xen50k -c /data/xen_s9_r1_50k/groundtruth_classification.txt
 
-Note: mainscript.sh expects to find "fast5" directory within exptdir
+**NOTE**: mainscript.sh expects to find "fast5" directory within exptdir
 i.e. 
 	path/to/exptdir
 	└── fast5
@@ -138,7 +138,7 @@ i.e.
 	Output:
 	$(dirname $exptdir)/matrix_CNN/$agggrp.Agg.morefts.10bin.inML.txt
 
-	Note: This script can be run on any number of runs and will determine how reads across runs (if applicable) are aggregated before passing into the CNN model.
+	**NOTE**: This script aggregates all files in matrix_CNN that were processed with the same group name (-g) and generates one file per group for downstream processing.
 
 
 ### **From step 5 onwards, there are 2 paths: training and testing.**
