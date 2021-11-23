@@ -97,7 +97,7 @@ i.e.
 ### Run Mainscript.sh (Steps 1 to 3) on individual sequencing runs
 	
 #### (1) Basecall fast5 -> map to genome reference -> run nanopolish to extract signal
-	Script:
+	Script(s):
 	S1.Basecall_map_nanopolish.sh (input: $exptdir $ref $numcore)
 	
 	Output:
@@ -108,7 +108,7 @@ i.e.
 
 
 #### (2) Process data: convert bam file to tsv and combine nanopolish into single signal for each 5-mer of a read
-	Scripts:
+	Script(s):
 	S2.Process_bam_nnpl.sh (input: $exptdir $ref $numcore)
 	└── s2.Sam2tsv_processtsv.sh
 	└── s2.Combine_raw_nnpl.sh
@@ -120,7 +120,7 @@ i.e.
 
 
 #### (3) Combine bam-tsv file and combined nanopolish file to generate raw features table
-	Scripts:
+	Script(s):
 	S3.Generate_raw_features.sh (input: $exptdir $numcore $agggrp)
 	└── S3.Generate_raw_features.sh
 		└── s3.Generate_raw_feature_table.R
@@ -131,7 +131,7 @@ i.e.
 ### Aggregate reads from single or multiple related runs (e.g. H9 Wildtype cell line)
 	
 #### (4) Aggregate features of reads into positions
-	Scripts:
+	Script(s):
 	S4.Aggregate_reads_into_pos.sh (input: $exptdir $numcore $agggrp)
 		└── s4.Aggregating_reads_pos.R
 		
@@ -149,7 +149,7 @@ We provided 3 trained models for testing. Users can used our models to detect In
 **NOTE**: Models 1 and 2 was trained using H9 and Xenopus Laevis data. Model 3 was trained using editing sites in H9, Xenopus Laevis, HCT116, Mus musculus (Mouse) and synthetic RNAs.
 
 #### (5) Transform 1D into 2D data + Label data (class 0, 1 and 2 for unmodified, Inosine and SNP AG)
-	Scripts:
+	Script(s):
 	S5.Transform_dim.sh (input:  $exptdir $numcore $agggrp $classref)
 		└── s5.Preprocess_data_matrix_inputCNN.R
 		
@@ -158,6 +158,7 @@ We provided 3 trained models for testing. Users can used our models to detect In
 	
 	
 #### (6) Predict testing data using Dinopore models + Plot ROC and PR curves for the result
+	Script(s):
 	S6.Predict.sh (input: $exptdir $agggrp $numcore $classref)
 		└── s6.Predict_test_data.R
 	
@@ -180,7 +181,7 @@ For our data: model 3 was trained using 265,631 positions with 893,865 matrices,
 **NOTE 3**: User should make sure number of epochs is at least 500 epochs for model 1 and model 2, and at least 900 epochs for model 3
 
 #### (5) Transform 1D into 2D data + Label data (class 0, 1 and 2 for unmodified, Inosine and SNP AG) + Split into training and validation/testing data set
-	Scripts:
+	Script(s):
 	S5.Train_transform_dim.sh (input:  $exptdir $numcore $agggrp $classref)
 		└── s5.Train_preprocess_data_matrix_inputCNN_train_val.R
 		
@@ -189,7 +190,7 @@ For our data: model 3 was trained using 265,631 positions with 893,865 matrices,
 	$agggrp.training_matrix.rds
 	
 #### (6a) Train 3-class classification model
-	Scripts:
+	Script(s):
 	S6a.Train_model1.sh (input:  $exptdir $agggrp $epoch $batch $seed)
 		└── s6a.Training_classification_model_3class.R
 		
@@ -197,7 +198,7 @@ For our data: model 3 was trained using 265,631 positions with 893,865 matrices,
 	$agggrp.best_pos5_mix_3class_resnet.h5
 	
 #### (6b) Train 2-class classification model
-	Scripts:
+	Script(s):
 	S6b.Train_model2.sh (input:  $exptdir $agggrp $epoch $batch $seed)
 		└── s6b.Training_classification_model_2class.R
 		
@@ -205,7 +206,7 @@ For our data: model 3 was trained using 265,631 positions with 893,865 matrices,
 	$agggrp.best_pos5_mix_3c_1vs1_resnet.h5
 	
 #### (6c) Train regression model
-	Scripts:
+	Script(s):
 	S6c.Train_model3.sh (input:  $exptdir $agggrp $epoch $batch $seed)
 		└── s6c.Training_regression_model.R
 		
@@ -213,6 +214,7 @@ For our data: model 3 was trained using 265,631 positions with 893,865 matrices,
 	$agggrp.best_regression_morefts_16384_1024_asin06.h5
 	
 #### (7) Predict testing data using trained models in step 6a, 6b and 6c
+	Script(s):
 	S7.Predict.sh (input: $exptdir $numcore $agggrp)
 		└── s7.Predict_test_data_using_trained_models.R
 	
