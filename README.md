@@ -224,6 +224,7 @@ For our data: model 3 was trained using 265,631 positions with 893,865 matrices,
 	Script(s):
 	Rscript s7.Predict_test_data_using_trained_models.R -i $input -t  $numcore -m $model1 -M $model2 -r $model3
 	where
+		input=${groupName}.validation_matrix.rds
 		model1=${groupName}.best_pos5_mix_3class_resnet.h5
 		model2=${groupName}.best_pos5_mix_3c_1vs1_resnet.h5
 		model3=${groupName}.best_regression_morefts_16384_1024_asin06.h5
