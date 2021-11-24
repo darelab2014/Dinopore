@@ -66,7 +66,9 @@ conda activate myenv
 
 ## USAGE
 
-bash mainscript.sh -e <path/to/exptdir> -r <path/to/ref.fa> -n <num_threads> -g <aggregation_Group> -c <class_Reference>
+bash mainscript1.sh -e <path/to/exptdir> -r <path/to/ref.fa> -n <num_threads> -g <aggregation_Group> -c <class_Reference>
+
+bash mainscript2.sh -e <path/to/exptdir> -r <path/to/ref.fa> -n <num_threads> -g <aggregation_Group> -c <class_Reference>
 
 	Arguments required
 		-e Full path to directory containing "fast5" folder. User must have write permission for the parent directory of this directory too.
