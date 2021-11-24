@@ -170,7 +170,7 @@ We provided 3 trained models for testing. Users can used our models to detect In
 
 ### (II) Training path: 
 
-We allow users to train models using their own data, based on our models' architecture. Depending on size of data set, number of epochs, batch size and GPU type, time required for training will vary.
+Users can train models using their own data, based on our models' architecture. Depending on the dataset size, number of epochs, batch size and GPU type, time required for training will vary.
 
 For our data: model 3 was trained using 265,631 positions with 893,865 matrices, on GPU NVIDIA GeForce RTX3080 with batch size = 1024. Time for 1 epoch is 88 seconds and there were 900 epochs.
 
@@ -180,51 +180,57 @@ For our data: model 3 was trained using 265,631 positions with 893,865 matrices,
 
 **NOTE 3**: User should make sure number of epochs is at least 500 epochs for model 1 and model 2, and at least 900 epochs for model 3
 	
-**NOTE 4**: Scripts for training uses GPU. If users wish to use CPU for training, please remove the following lines of code:
-	s6a.Training_classification_model_3class.R - 58, 59
-	s6b.Training_classification_model_2class.R - 58, 59
-	s6c.Training_regression_model.R - 74, 75
+**NOTE 4**: Scripts for training uses GPU. If users wish to use CPU for training, please remove the following lines of code from the respective scripts: s6a.Training_classification_model_3class.R (lines 58-59), s6b.Training_classification_model_2class.R (lines 58-59), s6c.Training_regression_model.R (lines 74-75).
+	
+**NOTE 5**: Training scripts should be run in the directory containing the input file (usually matrix_CNN)
 
 #### (5) Transform 1D into 2D data + Label data (class 0, 1 and 2 for unmodified, Inosine and SNP AG) + Split into training and validation/testing data set
 	Script(s):
-	S5.Train_transform_dim.sh (input:  $exptdir $numcore $agggrp $classref)
-		└── s5.Train_preprocess_data_matrix_inputCNN_train_val.R
+	Rscript s5.Train_preprocess_data_matrix_inputCNN_train_val.R -t $numcore -i $input -o $output -c $classref
+	where
+		input=${groupName}.Agg.morefts.10bin.inML.txt
+		output=${groupName}
+		classref="groundtruth_training_file" (see NOTE 2 above)
 		
 	Output:
-	$agggrp.validation_matrix.rds
-	$agggrp.training_matrix.rds
+	${groupName}.validation_matrix.rds (used as $vali in step 6a-c)
+	${groupName}.training_matrix.rds (used as $train in step 6a-c)
 	
 #### (6a) Train 3-class classification model
 	Script(s):
-	S6a.Train_model1.sh (input:  $exptdir $agggrp $epoch $batch $seed)
-		└── s6a.Training_classification_model_3class.R
+	Rscript s6a.Training_classification_model_3class.R -v $vali -t $train -o $groupName -e $epoch -b $batch -s $seed
+	where
+		vali=${groupName}.validation_matrix.rds
+		train=${groupName}.training_matrix.rds
 		
 	Output:
-	$agggrp.best_pos5_mix_3class_resnet.h5
+	${groupName}.best_pos5_mix_3class_resnet.h5
 	
 #### (6b) Train 2-class classification model
 	Script(s):
-	S6b.Train_model2.sh (input:  $exptdir $agggrp $epoch $batch $seed)
-		└── s6b.Training_classification_model_2class.R
+	Rscript s6b.Training_classification_model_2class.R  -v $vali -t $train -o $groupName -e $epoch -b $batch -s $seed
 		
 	Output:
-	$agggrp.best_pos5_mix_3c_1vs1_resnet.h5
+	${groupName}.best_pos5_mix_3c_1vs1_resnet.h5
 	
 #### (6c) Train regression model
 	Script(s):
-	S6c.Train_model3.sh (input:  $exptdir $agggrp $epoch $batch $seed)
-		└── s6c.Training_regression_model.R
+	Rscript s6c.Training_regression_model.R -v $vali -t $train -o $groupName -e $epoch -b $batch -s $seed
 		
 	Output:
-	$agggrp.best_regression_morefts_16384_1024_asin06.h5
+	${groupName}.best_regression_morefts_16384_1024_asin06.h5
 	
 #### (7) Predict testing data using trained models in step 6a, 6b and 6c
 	Script(s):
-	S7.Predict.sh (input: $exptdir $numcore $agggrp)
-		└── s7.Predict_test_data_using_trained_models.R
+	Rscript s7.Predict_test_data_using_trained_models.R -i $input -t  $numcore -m $model1 -M $model2 -r $model3
+	where
+		model1=${groupName}.best_pos5_mix_3class_resnet.h5
+		model2=${groupName}.best_pos5_mix_3c_1vs1_resnet.h5
+		model3=${groupName}.best_regression_morefts_16384_1024_asin06.h5
+
 	
 	Output:
-	$agggrp.output_prediction_CNN_class0.txt
-	$agggrp.output_prediction_CNN_class1.txt
-	$agggrp.output_prediction_CNN_class2.txt
+	${groupName}.output_prediction_CNN_class0.txt
+	${groupName}.output_prediction_CNN_class1.txt
+	${groupName}.output_prediction_CNN_class2.txt
 	
