@@ -182,7 +182,7 @@ For our data: model 3 was trained using 265,631 positions with 893,865 matrices,
 	
 **NOTE 4**: Scripts for training uses GPU. If users wish to use CPU for training, please remove the following lines of code from the respective scripts: s6a.Training_classification_model_3class.R (lines 58-59), s6b.Training_classification_model_2class.R (lines 58-59), s6c.Training_regression_model.R (lines 74-75).
 	
-**NOTE 5**: Training scripts should be run in the directory containing the input file (usually matrix_CNN)
+**NOTE 5**: Training scripts should be run in the same directory as the input file (usually matrix_CNN). The output file will be generated in the same directory.
 
 #### (5) Transform 1D into 2D data + Label data (class 0, 1 and 2 for unmodified, Inosine and SNP AG) + Split into training and validation/testing data set
 	Script(s):
