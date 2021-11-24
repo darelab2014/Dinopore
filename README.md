@@ -5,7 +5,7 @@ DInoPORE is a computational method to detect Adenosine-to-Inosine (A-to-I) editi
 
 This GitHub repository contains the scripts to run DInoPORE. Users who wish to train their own models using DInoPORE's architecture can also find the scripts for training (see training path section below).
 
-A sample dataset to illustrate how the pipeline runs and the typical runtime for a small sample can be found in DInoPORE's Code Ocean capsule, DOI <Insert DOI>. This dataset contains 53,283 direct-RNA-seq reads from Xenopus Laevis stage 9 rep 1. R Markdown files reproducing key results from the DInoPORE manuscript can also be found in the Code Ocean capsule under /data/Rmarkdown.
+A sample dataset to illustrate how the pipeline runs and the typical runtime for a small sample can be found in DInoPORE's Code Ocean capsule (DOI: 10.24433/CO.2180901.v1). This dataset contains 53,283 direct-RNA-seq reads from Xenopus Laevis stage 9 rep 1. R Markdown files reproducing key results from the DInoPORE manuscript can also be found in the Code Ocean capsule under /data/Rmarkdown.
 
 Listed below are the computational environment and software used. Usage documentation can be found in the last section of this readme.
 
