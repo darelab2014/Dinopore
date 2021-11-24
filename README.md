@@ -128,6 +128,7 @@ E.g. bash mainscript.sh -e /data/xen_s9_r1_50k -r /data/reference/xenLae2.fa -n 
 	Output:
 	$(dirname $exptdir)/aggregate_reads/${expt}.tsv_nnpl_inAE.txt_grp${agggrp}
 
+	
 ### Run Mainscript2.sh (Steps 4 to 6)
 
 #### (4) Aggregate features of reads into positions
@@ -229,7 +230,6 @@ For our data: model 3 was trained using 265,631 positions with 893,865 matrices,
 		model2=${groupName}.best_pos5_mix_3c_1vs1_resnet.h5
 		model3=${groupName}.best_regression_morefts_16384_1024_asin06.h5
 
-	
 	Output:
 	${groupName}.output_prediction_CNN_class0.txt
 	${groupName}.output_prediction_CNN_class1.txt
