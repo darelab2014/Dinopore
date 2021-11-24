@@ -170,7 +170,7 @@ We provided 3 trained models for testing. Users can used our models to detect In
 
 ### (II) Training path: 
 
-We allow users to train models using their own data, based on our models' architecture. Depending on size of data set, number of epochs, batch size and GPU type, time required for training will vary.
+Users can train models using their own data, based on our models' architecture. Depending on the dataset size, number of epochs, batch size and GPU type, time required for training will vary.
 
 For our data: model 3 was trained using 265,631 positions with 893,865 matrices, on GPU NVIDIA GeForce RTX3080 with batch size = 1024. Time for 1 epoch is 88 seconds and there were 900 epochs.
 
