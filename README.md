@@ -180,10 +180,9 @@ For our data: model 3 was trained using 265,631 positions with 893,865 matrices,
 
 **NOTE 3**: User should make sure number of epochs is at least 500 epochs for model 1 and model 2, and at least 900 epochs for model 3
 	
-**NOTE 4**: Scripts for training uses GPU. If users wish to use CPU for training, please remove the following lines of code from the respective scripts:
-	s6a.Training_classification_model_3class.R - 58, 59
-	s6b.Training_classification_model_2class.R - 58, 59
-	s6c.Training_regression_model.R - 74, 75
+**NOTE 4**: Scripts for training uses GPU. If users wish to use CPU for training, please remove the following lines of code from the respective scripts: s6a.Training_classification_model_3class.R (lines 58-59), s6b.Training_classification_model_2class.R (lines 58-59), s6c.Training_regression_model.R (lines 74-75).
+	
+**NOTE 5**: Training scripts should be run in the directory containing the input file (usually matrix_CNN)
 
 #### (5) Transform 1D into 2D data + Label data (class 0, 1 and 2 for unmodified, Inosine and SNP AG) + Split into training and validation/testing data set
 	Script(s):
