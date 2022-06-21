@@ -85,7 +85,7 @@ bash mainscript2.sh -e <path/to/exptdir> -r <path/to/ref.fa> -n <num_threads> -g
 		-d [y/n] Delete base-called fastq files? Default value is n.
 
 
-E.g. bash mainscript.sh -e /data/xen_s9_r1_50k -r /data/reference/xenLae2.fa -n 15 -g xen50k -c /data/xen_s9_r1_50k/groundtruth_classification.txt
+E.g. bash mainscript.sh -e /data/xen_s9_r1_50k -r /data/reference/xenLae2.fa -n 15 -g xen50k -c /data/xen_s9_r1_50k/groundtruth_class_regression.tsv
 
 **NOTE**: mainscript.sh expects to find "fast5" directory within exptdir:
 ###
