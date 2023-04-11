@@ -66,7 +66,7 @@ conda activate myenv
 
 ## USAGE
 
-bash mainscript1.sh -e <path/to/exptdir> -r <path/to/ref.fa> -n <num_threads> -g <aggregation_Group> -c <class_Reference>
+bash mainscript1.sh -e <path/to/exptdir> -r <path/to/ref.fa> -n <num_threads> -g <aggregation_Group>
 
 bash mainscript2.sh -e <path/to/exptdir> -r <path/to/ref.fa> -n <num_threads> -g <aggregation_Group> -c <class_Reference>
 
@@ -79,7 +79,7 @@ bash mainscript2.sh -e <path/to/exptdir> -r <path/to/ref.fa> -n <num_threads> -g
 
 		-g User-defined group name used to specify runs belonging to same group. Affects aggregation step when aggregating across multiple experiment runs.
 
-		-c Class and edit rate reference containing ground truth information about a coordinates' class and edit rate
+		-c Class and edit rate reference containing ground truth information about a coordinates' class and edit rate (see code/misc/Example_classref.tsv for format)
 	
 	Optional argument
 		-d [y/n] Delete base-called fastq files? Default value is n.

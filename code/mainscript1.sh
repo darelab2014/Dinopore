@@ -3,7 +3,7 @@ set -e
 
 # This is the master script for the capsule. When you click "Reproducible Run", the code in this file will execute.
 
-codedir="/home/s190075/dinoporegit/code"
+codedir="/path/to/dinopore/code"
 
 export SAM2TSV="java -jar ${codedir}/misc/sam2tsv.jar"
 export PICARD="java -jar ${codedir}/misc/picard.jar"
@@ -14,7 +14,7 @@ delfastq=n
 
 usage() {                                 # Function: Print a help message.
     echo ""
-    echo "Usage: $0 [ -e PATH/TO/EXPTDIR ] [ -r PATH/TO/REFERENCE.FASTA ] [ -n num_threads ] [ -g aggregateGroup ] [ -c classReference ]" 1>&2
+    echo "Usage: $0 [ -e PATH/TO/EXPTDIR ] [ -r PATH/TO/REFERENCE.FASTA ] [ -n num_threads ] [ -g aggregateGroup ]" 1>&2
     echo ""
     echo "Optional:"
     echo "  -d  [y/n] Delete base-called fastq files? Default value is n."
@@ -24,7 +24,7 @@ exit_abnormal() {                         # Function: Exit with error.
   usage
   exit 1
 }
-while getopts ":e:r:n:g:c:d:" options; do         # Loop: Get the next option;
+while getopts ":e:r:n:g:d:" options; do         # Loop: Get the next option;
                                           # use silent error checking;
                                           # options n and t take arguments.
   case "${options}" in                    #
@@ -48,9 +48,6 @@ while getopts ":e:r:n:g:c:d:" options; do         # Loop: Get the next option;
       ;;
     g)                                    # If unknown (any other) option:
 	  agggrp=${OPTARG}					  # Set $agggrp to specified value.
-      ;;
-    c)                                   # If unknown (any other) option:
-	  classref=${OPTARG}				  # Set $classref to specified value.
       ;;
     d)                                   # If unknown (any other) option:
 	  delfastq=${OPTARG}				  # Set $delfastq to specified value.
@@ -86,12 +83,6 @@ if [ "$agggrp" = "" ]; then
         exit_abnormal
 fi
 
-if [ "$classref" = "" ]; then
-        echo "Error: please provide class and edit rate ground truth."
-        exit_abnormal
-        exit 1
-fi
-
 if [ "$delfastq" = "" ]; then
   delfastq=n
 elif [ "$delfastq" = "n" ]; then
@@ -109,7 +100,6 @@ else
   exit_abnormal
   exit 1
 fi
-
 
 #Step 1 - Basecall fast5 -> map to genome reference -> run nanopolish to extract signal
 sh ${codedir}/S1.Basecall_map_nanopolish.sh $exptdir $ref $numcore $delfastq
